@@ -1,11 +1,11 @@
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP, DES3, AES
 import base64
 import hashlib
 import tkinter as tk
 from tkinter import ttk
 import tkinter.font as tkFont
 import sqlite3
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP, DES3, AES
 
 def create_database():
     conn = sqlite3.connect("nizar_database.db")
@@ -71,6 +71,10 @@ def caesar_encrypt(data, shift):
         else:
             result += char
     return result
+
+def show_first_interface():
+    login_frame.pack_forget()
+    first_frame.pack()
 
 def show_second_interface():
     first_frame.pack_forget()
@@ -141,6 +145,14 @@ first_frame = tk.Frame(root, bg="#363636")
 welcome_text = "مرحبًا بك في تطبيق نزار\n" \
                "للبدء في تخزين وإدارة كلمات المرور الخاصة بك بشكل آمن\n اضغط 'بدء' أدناه."
 
+login_frame = tk.Frame(root, bg="#363636")
+login_mess = "مرحبًا بك في تطبيق نزار\nيرجى تسجيل الدخول"
+login_lable = tk.Label(login_frame, text=login_mess
+                       ,font=(arabic_font.actual("family"), "17"), bg="#363636", fg="white", padx=20, pady=20, anchor='e')
+pin_lable = tk.Label(login_frame,text="ادخل كلمة المرور", bg="#363636", fg="white", font=("Arial", 14))
+pin_login = tk.Entry(login_frame, show="*", font=("Arial", 14))
+submit_login = tk.Button(login_frame, text="دخول", font=("Arial", 14), bg="#363636", fg="white", padx=20, pady=20, command=show_first_interface)
+
 welcome_label = tk.Label(first_frame, text=welcome_text,
                          font=(arabic_font.actual("family"), "17"), bg="#363636", fg="white", padx=20, pady=20, anchor='e')
 
@@ -178,6 +190,10 @@ site_name_entry_second.pack(pady=10)
 encryption_type_label_second.pack(pady=10)
 encryption_type_combobox_second.pack(pady=10)
 encrypt_button_second.pack(pady=20)
+login_lable.pack(pady=20)
+pin_lable.pack(pady=10)
+pin_login.pack(pady=10)
+submit_login.pack(pady=20)
 
 third_frame = tk.Frame(root, bg="#363636")
 
@@ -210,7 +226,7 @@ result_text_fourth.config(state=tk.DISABLED)
 result_text_fourth.pack(pady=20)
 fetch_button_fourth.pack(pady=20)
 
-first_frame.pack()
+login_frame.pack()
 root.grid_rowconfigure(0, weight=1)
 root.grid_columnconfigure(0, weight=1)
 
