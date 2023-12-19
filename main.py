@@ -2,10 +2,16 @@ import base64
 import hashlib
 import tkinter as tk
 from tkinter import ttk
+import tkinter
+import tkinter.messagebox as tkm
 import tkinter.font as tkFont
 import sqlite3
+from view_table import View
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP, DES3, AES
+
+LOGIN_PASS = "123" # User password
+DEF_BG = "#363636" # Defualt Backgroud color
 
 def create_database():
     conn = sqlite3.connect("nizar_database.db")
@@ -62,7 +68,7 @@ def encrypt_data(data, encryption_type, shift=3):
     else:
         return "Unsupported Encryption Type"
 
-def caesar_encrypt(data, shift):
+def caesar_encrypt(data:str, shift:int):
     result = ""
     for char in data:
         if char.isalpha():
@@ -87,6 +93,7 @@ def show_third_interface():
 def show_fourth_interface():
     third_frame.pack_forget()
     fourth_frame.pack()
+    fetch_user_data()
 
 def encrypt_and_show_third_interface():
     password = password_entry_second.get()
@@ -104,25 +111,28 @@ def encrypt_and_show_third_interface():
 
 def validate_password():
     entered_password = password_entry_third.get()
-    if entered_password == "123":
+    if entered_password == "":
+        tkm.showwarning("تحذير","يرجى إدخال كلمة المرور")
+    elif entered_password == "123":
         show_fourth_interface()
     else:
-        status_label_third.config(text="كلمة المرور غير صحيحة")
+        tkm.showerror("خطأ", "كلمة المرور غير صحيحة")
+        # status_label_third.config(text="كلمة المرور غير صحيحة")
+
+def validate_login_password():
+    if pin_login.get() == "":
+        tkm.showwarning("تحذير","يرجى إدخال كلمة المرور")
+    elif pin_login.get() == LOGIN_PASS:
+        show_first_interface()
+    else:
+        tkm.showerror("خطأ","كلمة المرور غير صحيحة")
 
 def fetch_user_data():
     conn = sqlite3.connect("nizar_database.db")
     c = conn.cursor()
     c.execute("SELECT * FROM user_info")
     data = c.fetchall()
-    result_text_fourth.config(state=tk.NORMAL)
-    result_text_fourth.delete(1.0, tk.END)
-    for row in data:
-        result_text_fourth.insert(tk.END, f"ID: {row[0]}\n")
-        result_text_fourth.insert(tk.END, f"Encrypted Password: {row[1]}\n")
-        result_text_fourth.insert(tk.END, f"Encrypted Email: {row[2]}\n")
-        result_text_fourth.insert(tk.END, f"Encrypted Site Name: {row[3]}\n")
-        result_text_fourth.insert(tk.END, f"Encryption Type: {row[4]}\n\n")
-    result_text_fourth.config(state=tk.DISABLED)
+    View(table_frame)
 
 root = tk.Tk()
 root.title("تطبيق نزار لإدارة كلمات المرور")
@@ -138,42 +148,42 @@ window_height = int(screen_height * 0.8)
 
 root.geometry(f"{window_width}x{window_height}+{int((screen_width - window_width) / 2)}+{int((screen_height - window_height) / 2)}")
 
-root.configure(bg="#363636")
+root.configure(bg=DEF_BG)
 
-first_frame = tk.Frame(root, bg="#363636")
+first_frame = tk.Frame(root, bg=DEF_BG)
 
 welcome_text = "مرحبًا بك في تطبيق نزار\n" \
                "للبدء في تخزين وإدارة كلمات المرور الخاصة بك بشكل آمن\n اضغط 'بدء' أدناه."
 
-login_frame = tk.Frame(root, bg="#363636")
+login_frame = tk.Frame(root, bg=DEF_BG)
 login_mess = "مرحبًا بك في تطبيق نزار\nيرجى تسجيل الدخول"
 login_lable = tk.Label(login_frame, text=login_mess
-                       ,font=(arabic_font.actual("family"), "17"), bg="#363636", fg="white", padx=20, pady=20, anchor='e')
-pin_lable = tk.Label(login_frame,text="ادخل كلمة المرور", bg="#363636", fg="white", font=("Arial", 14))
+                       ,font=(arabic_font.actual("family"), "17"), bg=DEF_BG, fg="white", padx=20, pady=20, anchor='e')
+pin_lable = tk.Label(login_frame,text="ادخل كلمة المرور", bg=DEF_BG, fg="white", font=("Arial", 14))
 pin_login = tk.Entry(login_frame, show="*", font=("Arial", 14))
-submit_login = tk.Button(login_frame, text="دخول", font=("Arial", 14), bg="#363636", fg="white", padx=20, pady=20, command=show_first_interface)
+submit_login = tk.Button(login_frame, text="دخول", font=("Arial", 14), bg=DEF_BG, fg="white", padx=20, pady=20, command=validate_login_password)
 
 welcome_label = tk.Label(first_frame, text=welcome_text,
-                         font=(arabic_font.actual("family"), "17"), bg="#363636", fg="white", padx=20, pady=20, anchor='e')
+                         font=(arabic_font.actual("family"), "17"), bg=DEF_BG, fg="white", padx=20, pady=20, anchor='e')
 
 start_button = tk.Button(first_frame, text="بدء", command=show_second_interface, font=("Arial", 16), bg="#404040", fg="white")
 
 welcome_label.pack(pady=50)
 start_button.pack(pady=20)
 
-second_frame = tk.Frame(root, bg="#363636")
+second_frame = tk.Frame(root, bg=DEF_BG)
 
 info_label_second = tk.Label(second_frame, text="ادخل الإيميل وكلمة المرور واسم الموقع للتشفير",
-                             font=("Arial", 16), bg="#363636", fg="white")
+                             font=("Arial", 16), bg=DEF_BG, fg="white")
 info_label_second.pack(pady=10)
 
-password_label_second = tk.Label(second_frame, text="كلمة المرور:", font=("Arial", 16), bg="#363636", fg="white")
+password_label_second = tk.Label(second_frame, text="كلمة المرور:", font=("Arial", 16), bg=DEF_BG, fg="white")
 password_entry_second = tk.Entry(second_frame, show="*", font=("Arial", 14))
-email_label_second = tk.Label(second_frame, text="البريد الإلكتروني:", font=("Arial", 16), bg="#363636", fg="white")
+email_label_second = tk.Label(second_frame, text="البريد الإلكتروني:", font=("Arial", 16), bg=DEF_BG, fg="white")
 email_entry_second = tk.Entry(second_frame, font=("Arial", 14))
-site_name_label_second = tk.Label(second_frame, text="اسم الموقع أو التطبيق:", font=("Arial", 16), bg="#363636", fg="white")
+site_name_label_second = tk.Label(second_frame, text="اسم الموقع أو التطبيق:", font=("Arial", 16), bg=DEF_BG, fg="white")
 site_name_entry_second = tk.Entry(second_frame, font=("Arial", 14))
-encryption_type_label_second = tk.Label(second_frame, text="نوع التشفير المستخدم", font=("Arial", 16), bg="#363636", fg="white")
+encryption_type_label_second = tk.Label(second_frame, text="نوع التشفير المستخدم", font=("Arial", 16), bg=DEF_BG, fg="white")
 encryption_types = ["RSA", "Caesar", "DES", "AES", "3DES"]
 encryption_type_combobox_second = ttk.Combobox(second_frame, values=encryption_types, font=("Arial", 14))
 
@@ -195,36 +205,35 @@ pin_lable.pack(pady=10)
 pin_login.pack(pady=10)
 submit_login.pack(pady=20)
 
-third_frame = tk.Frame(root, bg="#363636")
+third_frame = tk.Frame(root, bg=DEF_BG)
 
 info_label_third = tk.Label(third_frame, text="لعرض الإيميلات وكلمات المرور المخزنة أدخل كلمة المرور الرئيسية للتطبيق",
-                            font=("Arial", 16), bg="#363636", fg="white")
+                            font=("Arial", 16), bg=DEF_BG, fg="white")
 info_label_third.pack(pady=10)
 
-password_label_third = tk.Label(third_frame, text="كلمة المرور:", font=("Arial", 16), bg="#363636", fg="white")
+password_label_third = tk.Label(third_frame, text="كلمة المرور:", font=("Arial", 16), bg=DEF_BG, fg="white")
 password_entry_third = tk.Entry(third_frame, show="*", font=("Arial", 14))
 validate_button_third = tk.Button(third_frame, text="التحقق والانتقال", command=validate_password,
                                   font=("Arial", 16), bg="#404040", fg="white")
-status_label_third = tk.Label(third_frame, text="", font=("Arial", 12), bg="#363636", fg="red")
+# status_label_third = tk.Label(third_frame, text="", font=("Arial", 12), bg=DEF_BG, fg="red")
 
 password_label_third.pack(pady=10)
 password_entry_third.pack(pady=10)
 validate_button_third.pack(pady=20)
-status_label_third.pack(pady=10)
+# status_label_third.pack(pady=10)
 
-fourth_frame = tk.Frame(root, bg="#363636")
+fourth_frame = tk.Frame(root, bg=DEF_BG, width=200, height=300)
 
-info_label_fourth = tk.Label(fourth_frame, text="مخزن البيانات وكلمات المرور", font=("Arial", 18), bg="#363636", fg="white")
+info_label_fourth = tk.Label(fourth_frame, text="مخزن البيانات وكلمات المرور", font=("Arial", 18), bg=DEF_BG, fg="white")
 info_label_fourth.pack(pady=10)
 
-result_text_fourth = tk.Text(fourth_frame, font=("Arial", 12), height=20, width=60)
-fetch_button_fourth = tk.Button(fourth_frame, text="احضار البيانات", command=fetch_user_data,
-                                font=("Arial", 16), bg="#404040", fg="white")
+table_frame = tk.Frame(fourth_frame, height=150, width=200, bg=DEF_BG)
+# fetch_button_fourth = tk.Button(fourth_frame, text="احضار البيانات", command=fetch_user_data,
+#                                 font=("Arial", 16), bg="#404040", fg="white")
 
-result_text_fourth.config(state=tk.DISABLED)
 
-result_text_fourth.pack(pady=20)
-fetch_button_fourth.pack(pady=20)
+table_frame.pack(pady=20)
+# fetch_button_fourth.pack(pady=20)
 
 login_frame.pack()
 root.grid_rowconfigure(0, weight=1)
