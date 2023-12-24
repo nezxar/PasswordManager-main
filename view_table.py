@@ -9,7 +9,7 @@ def connect():
     con.commit()
     con.close()
 
-def View(root: tk.Tk | tk.Frame):
+def View(root: tk.Tk | tk.Frame | ttk.Frame):
     tree = ttk.Treeview(root, columns=("c1", "c2", "c3", "c4", "c5"), show='headings')
     tree.column("#1", anchor=tk.CENTER, width=8)
     tree.heading("#1", text="ID")
